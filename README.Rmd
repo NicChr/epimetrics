@@ -17,6 +17,7 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/NicChr/epimetrics/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/NicChr/epimetrics/actions/workflows/R-CMD-check.yaml)
+[![Codecov test coverage](https://codecov.io/gh/NicChr/epimetrics/branch/main/graph/badge.svg)](https://app.codecov.io/gh/NicChr/epimetrics?branch=main)
 <!-- badges: end -->
 
 ## A package for easy calculation of diagnostic test metrics with confidence intervals
@@ -45,6 +46,7 @@ CM <- matrix(c(TP, FP, FN, TN), byrow = TRUE, ncol = 2)
 rownames(CM) <- c("+Test", "-Test")
 colnames(CM) <- c("+Disease", "-Disease")
 CM
+set.seed(42)
 diagnostic_metrics(CM)
 ```
 
@@ -89,6 +91,7 @@ outcomes <- c(rep(1, TP + FN), # With disease
 predictions <- c(rep(1, TP), rep(0, FN), # Disease group predictions
                  rep(1, FP), rep(0, TN)) # Non-disease group predictions
 (cm <- confusion_matrix(outcomes, predictions))
+set.seed(42)
 diagnostic_metrics(cm)
 ```
 

@@ -433,11 +433,11 @@ ppv(x = c(TP, FP, FN + FN2, TN + TN2)) # Wilson-score method
 }
 \references{
 Shan G. Improved Confidence Intervals for the Youden Index.
-PLoS One. 2015 Jul 1;10(7):e0127272.\cr
+PLoS One. 2015 Jul 1;10(7):e0127272.
 doi: 10.1371/journal.pone.0127272
 
 Bender R. Calculating confidence intervals for the number needed to treat.
-Control Clin Trials. 2001 Apr;22(2):102-10.\cr
+Control Clin Trials. 2001 Apr;22(2):102-10.
 doi: s0197-2456(00)00134-3
 
 Sakthivel Sivam, S. M.
@@ -449,11 +449,11 @@ Ponneri, India 2016 (2014).
 \url{https://www.lexjansen.com/pharmasug/2016/SP/PharmaSUG-2016-SP08.pdf}
 
 Balayla J. Prevalence threshold and the geometry of screening curves.
-PLoS One. 2020 Oct 7;15(10):e0240215.\cr
+PLoS One. 2020 Oct 7;15(10):e0240215.
 doi: 10.1371/journal.pone.0240215
 
 Smits, N. A note on Youden's J and its cost ratio.
-BMC Med Res Methodol 10, 89 (2010).\cr
+BMC Med Res Methodol 10, 89 (2010).
 doi: 10.1186/1471-2288-10-89
 
 Kantele A, Paajanen J, Turunen S, Pakkanen SH, Patjas A, Itkonen L,
@@ -461,6 +461,6 @@ Heiskanen E, Lappalainen M, Desquilbet L, Vapalahti O,
 Hielm-Björkman A.
 Scent dogs in detection of COVID-19: triple-blinded randomised trial
 and operational real-life screening in airport setting.
-BMJ Glob Health. 2022 May;7(5):e008024.\cr
+BMJ Glob Health. 2022 May;7(5):e008024.
 doi: 10.1136/bmjgh-2021-008024
 }
