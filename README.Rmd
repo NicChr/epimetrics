@@ -13,6 +13,12 @@ knitr::opts_chunk$set(
 )
 ```
 
+# epimetrics
+
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/NicChr/epimetrics/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/NicChr/epimetrics/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
+
 ## A package for easy calculation of diagnostic test metrics with confidence intervals
 
 ## Installation
