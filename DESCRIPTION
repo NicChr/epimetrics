@@ -1,0 +1,19 @@
+Package: epimetrics
+Title: Tools for Assessing Diagnostic Test Performance
+Version: 0.0.1
+Authors@R: 
+    person("Nick", "Christofidis", , "nicolaos.christofidis@gmail.com", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-9743-7342"))
+Description: Tools for assessing diagnostic test performance.
+License: GPL (>= 2)
+Depends:
+    R (>= 2.10)
+Imports:
+    knitr
+Suggests: 
+    rmarkdown,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.2

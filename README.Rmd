@@ -1,0 +1,90 @@
+---
+output: github_document
+---
+
+```{r setup, echo = FALSE}
+knitr::opts_chunk$set(
+  warning = FALSE,
+  echo = TRUE,
+  collapse = TRUE,
+  message = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-"
+)
+```
+
+## A package for easy calculation of diagnostic test metrics with confidence intervals
+
+## Installation
+
+```{r gh-installation, message = FALSE, eval = FALSE}
+remotes::install_github("Nic-Chr/epimetrics")
+```
+
+```{r package_load}
+library(epimetrics)
+```
+
+You can easily calculate metrics from data, which is typically
+compared to a gold standard
+
+```{r confusion}
+# Using a 2x2 confusion matrix example from wikipedia 
+# https://en.wikipedia.org/wiki/Sensitivity_and_specificity
+TP <- 20
+FP <- 180
+FN <- 10
+TN <- 1820
+CM <- matrix(c(TP, FP, FN, TN), byrow = TRUE, ncol = 2)
+rownames(CM) <- c("+Test", "-Test")
+colnames(CM) <- c("+Disease", "-Disease")
+CM
+diagnostic_metrics(CM)
+```
+
+0r from known or theoretical estimates of sensitivity, specificity 
+and prevalence
+
+```{r predictive_value}
+sens <- 0.75 # Sensitivity
+spec <- 0.95 # Specificity
+prev <- seq(0, 1, 0.01) # Prevalence
+ppv <- ppv(sens, spec, prev)
+npv <- npv(sens, spec, prev)
+plot(prev, ppv, col = "blue")
+points(prev, npv, col = "orange")
+legend(0.6, 0.4, legend = c("PPV", "NPV"),
+       col = c("blue", "orange"),
+       pch = c(1, 1))
+```
+
+You can also use standalone metrics
+
+```{r standalone}
+sensitivity(x = CM)
+specificity(x = CM)
+ppv(x = CM, conf.level = 0.95)
+```
+
+Easily simulate confusion matrix data
+
+```{r simulation}
+simulated_data <- simulate_confusion_data(TP, FP, FN, TN, R = 10)
+simulated_data
+ppv(x = simulated_data, conf.int = FALSE)
+ppv(x = simulated_data)
+```
+
+If your data are in non-aggregate form, you can use `confusion_matrix`
+
+```{r confusion2}
+outcomes <- c(rep(1, TP + FN), # With disease
+              rep(0, FP + TN)) # Without disease
+predictions <- c(rep(1, TP), rep(0, FN), # Disease group predictions
+                 rep(1, FP), rep(0, TN)) # Non-disease group predictions
+(cm <- confusion_matrix(outcomes, predictions))
+diagnostic_metrics(cm)
+```
+
+
+
