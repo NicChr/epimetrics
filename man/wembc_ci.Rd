@@ -27,11 +27,13 @@ wilson-score interval method, with a boundary correction for when the
 number of successes are either 0, or equal the number of trials.
 }
 \examples{
+\dontrun{
 library(epimetrics)
 wembc_ci(0, 0:10)
 wembc_ci(0:10, 0:10)
 combs <- expand.grid(0:999, 1000:2000)
 wembc_ci(combs[,1], combs[,2])
+}
 }
 \references{
 Sakthivel Sivam, S. M.

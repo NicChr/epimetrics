@@ -139,14 +139,12 @@
 #'
 #' @references
 #'  Shan G. Improved Confidence Intervals for the Youden Index.
-#'  PLoS One. 2015 Jul 1;10(7):e0127272.
-#'  doi: \href{https://doi.org/10.1371/journal.pone.0127272}{10.1371/journal.pone.0127272}.
-#'  PMID: 26132806; PMCID: PMC4488538.
+#'  PLoS One. 2015 Jul 1;10(7):e0127272.\cr
+#'  doi: 10.1371/journal.pone.0127272
 #'
 #'  Bender R. Calculating confidence intervals for the number needed to treat.
-#'  Control Clin Trials. 2001 Apr;22(2):102-10.
-#'  doi: \href{https://doi.org/10.1016/s0197-2456(00)00134-3}{10.1016/s0197-2456(00)00134-3}.
-#'  PMID: 11306148.
+#'  Control Clin Trials. 2001 Apr;22(2):102-10.\cr
+#'  doi: s0197-2456(00)00134-3
 #'
 #'  Sakthivel Sivam, S. M. 
 #'  "Everything or Nothing-A Better Confidence Intervals for Binomial
@@ -157,22 +155,20 @@
 #'  \url{https://www.lexjansen.com/pharmasug/2016/SP/PharmaSUG-2016-SP08.pdf}
 #'  
 #'  Balayla J. Prevalence threshold and the geometry of screening curves.
-#'  PLoS One. 2020 Oct 7;15(10):e0240215.
-#'  doi: \href{https://doi.org/10.1371/journal.pone.0240215}{10.1371/journal.pone.0240215}.
-#'  PMID: 33027310; PMCID: PMC7540853.
+#'  PLoS One. 2020 Oct 7;15(10):e0240215.\cr
+#'  doi: 10.1371/journal.pone.0240215
 #'
 #'  Smits, N. A note on Youden's J and its cost ratio.
-#'  BMC Med Res Methodol 10, 89 (2010).
-#'  doi: \href{https://doi.org/10.1186/1471-2288-10-89}{10.1186/1471-2288-10-89}
+#'  BMC Med Res Methodol 10, 89 (2010).\cr
+#'  doi: 10.1186/1471-2288-10-89
 #'
 #' Kantele A, Paajanen J, Turunen S, Pakkanen SH, Patjas A, Itkonen L,
 #' Heiskanen E, Lappalainen M, Desquilbet L, Vapalahti O,
 #' Hielm-Björkman A.
 #' Scent dogs in detection of COVID-19: triple-blinded randomised trial
 #' and operational real-life screening in airport setting.
-#' BMJ Glob Health. 2022 May;7(5):e008024.
-#' \href{https://doi.org/10.1136/bmjgh-2021-008024}{10.1136/bmjgh-2021-008024.}
-#' PMID: 35577391; PMCID: PMC9108438.
+#' BMJ Glob Health. 2022 May;7(5):e008024.\cr
+#' doi: 10.1136/bmjgh-2021-008024
 #'
 #' @examples
 #' library(epimetrics)
@@ -277,9 +273,8 @@
 #' # Use simulation to estimate uncertainty in any metric.
 #' # Here we choose sensitivity and ppv
 #' sim_cm <- simulate_confusion_data(TP, FP, (FN + FN2), (TN + TN2),
-#'                                   R = 10^6)
-#' TPRs <- sensitivity(x = sim_cm, conf.int = FALSE)[,"estimate"]
-#' sim_sensitivities <- sensitivity(x = sim_cm)[,"estimate"]
+#'                                   R = 10^4)
+#' sim_sensitivities <- sensitivity(x = sim_cm, conf.int = FALSE)[,"estimate"]
 #' hist(sim_sensitivities)
 #' sim_sens_lcl <- quantile(sim_sensitivities, 0.05/2)
 #' sim_sens_ucl <- quantile(sim_sensitivities, 1 - (0.05/2))
@@ -298,7 +293,6 @@
 #' sensitivity(x = c(TP, FP, FN + FN2, TN + TN2)) # Wilson-score method
 #' c(sim_ppv_lcl, sim_ppv_ucl) # Percentile method
 #' ppv(x = c(TP, FP, FN + FN2, TN + TN2)) # Wilson-score method
-#'
 #' @rdname diagnostic_metrics
 #' @export
 diagnostic_metrics <- function(cm, conf.int = TRUE, 

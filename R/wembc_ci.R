@@ -27,11 +27,13 @@
 #'  \url{https://www.lexjansen.com/pharmasug/2016/SP/PharmaSUG-2016-SP08.pdf}
 #'
 #' @examples
+#' \dontrun{
 #' library(epimetrics)
 #' wembc_ci(0, 0:10)
 #' wembc_ci(0:10, 0:10)
 #' combs <- expand.grid(0:999, 1000:2000)
 #' wembc_ci(combs[,1], combs[,2])
+#' }
 #' @export
 wembc_ci <- function(x, n, alpha = 0.05){
   max_l <- max(length(x), length(n), length(alpha))
