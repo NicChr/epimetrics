@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 ## Installation
 
 ```{r gh-installation, message = FALSE, eval = FALSE}
-remotes::install_github("Nic-Chr/epimetrics")
+remotes::install_github("NicChr/epimetrics")
 ```
 
 ```{r package_load}
