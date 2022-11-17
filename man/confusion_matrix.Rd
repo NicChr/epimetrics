@@ -11,6 +11,11 @@ confusion_matrix(outcome, prediction)
 
 \item{prediction}{Vector of predicted classes. e.g. "A", "B".}
 }
+\value{
+An n x m \code{matrix} where \code{n} is the number of
+distinct predicted classes and \code{m} is the number of
+distinct outcome classes.
+}
 \description{
 Wrapper around \code{table()} that
 creates an n x m confusion matrix of the number of
@@ -23,19 +28,19 @@ of the predicted and actual classes respectively in descending order,
 similar to the way that confusion matrices are usually presented.
 }
 \examples{
-\dontrun{
 library(epimetrics)
 library(MASS)
-library(randomForest)
 
 pima_train <- Pima.tr # Training data set
 pima_test <- Pima.te # Test data set
 
-rf_train <- randomForest(type ~ ., data = pima_train)
-rf_predictions <- predict(rf_train, newdata = pima_test)
+rf_train <- glm(type ~ ., data = pima_train, family = "binomial")
+rf_prob_scores <- predict(rf_train, newdata = pima_test,
+                          type = "response")
+# Typically you will use an ROC curve to determine best cutoff
+rf_predictions <- ifelse(rf_prob_scores >= 0.5, 1, 0)
 outcomes <- pima_test$type
 cm <- confusion_matrix(outcomes, rf_predictions)
 cm
 diagnostic_metrics(cm)
-}
 }
