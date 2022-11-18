@@ -27,13 +27,11 @@
 #'  \url{https://www.lexjansen.com/pharmasug/2016/SP/PharmaSUG-2016-SP08.pdf}
 #'
 #' @examples
-#' \dontrun{
 #' library(epimetrics)
 #' wembc_ci(0, 0:10)
 #' wembc_ci(0:10, 0:10)
-#' combs <- expand.grid(0:999, 1000:2000)
-#' wembc_ci(combs[,1], combs[,2])
-#' }
+#' combs <- expand.grid(0:999, 0:999)
+#' wembc_ci(combs[,2], combs[,1])
 #' @export
 wembc_ci <- function(x, n, alpha = 0.05){
   max_l <- max(length(x), length(n), length(alpha))
@@ -54,8 +52,6 @@ wembc_ci <- function(x, n, alpha = 0.05){
   lcl[ub_x] <- (alpha[ub_x]/2)^(1/n[ub_x])
   ucl[ub_x] <- 1
   ci_m <- matrix(c(p, lcl, ucl), ncol = 3, byrow = FALSE)
-  # rownames(ci_m) <- sprintf("(%.0f/%.0f)", x, n)
-  # rownames(ci_m) <- seq_len(nrow(ci_m))
   colnames(ci_m) <- c("estimate", "conf.low", "conf.high")
   ci_m
 }
