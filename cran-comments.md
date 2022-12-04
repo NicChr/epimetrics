@@ -15,13 +15,15 @@
   Maintainer: ‘Nick Christofidis <nicolaos.christofidis@gmail.com>’
   
   New submission
-
-❯ On fedora-clang-devel (r-devel)
-  checking CRAN incoming feasibility ... [6s/19s] NOTE
-  Maintainer: ‘Nick Christofidis <nicolaos.christofidis@gmail.com>’
   
-  New submission
-
-❯ On fedora-clang-devel (r-devel)
-  checking HTML version of manual ... NOTE
-  Skipping checking HTML validation: no command 'tidy' found
+  Possibly misspelled words in DESCRIPTION:
+    al (13:5, 18:5)
+    Balayla (17:5)
+    Daly (18:52)
+    et (12:71, 17:71)
+    Kantele (17:61)
+    Parikh (12:61)
+    Sakthivel (15:43)
+    Shan (13:49)
+    Sivam (15:53)
+    wilson (9:36)
