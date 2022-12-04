@@ -38,7 +38,7 @@ CM
 #> +Test       20      180
 #> -Test       10     1820
 set.seed(42)
-diagnostic_metrics(CM)
+epimetrics(CM)
 #>               characteristic abbreviation    estimate   conf.low   conf.high
 #> 1                sensitivity          TPR  0.66666667 0.48780052  0.80769502
 #> 2                specificity          TNR  0.91000000 0.89665917  0.92176885
@@ -143,7 +143,7 @@ predictions <- c(rep(1, TP), rep(0, FN), # Disease group predictions
 #>          1 20  180
 #>          0 10 1820
 set.seed(42)
-diagnostic_metrics(cm)
+epimetrics(cm)
 #>               characteristic abbreviation    estimate   conf.low   conf.high
 #> 1                sensitivity          TPR  0.66666667 0.48780052  0.80769502
 #> 2                specificity          TNR  0.91000000 0.89665917  0.92176885

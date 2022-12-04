@@ -28,7 +28,7 @@ testthat::test_that("Simulation tests", {
 })
 
 
-testthat::test_that("Compare standalone metrics to diagnostic_metrics", {
+testthat::test_that("Compare standalone metrics to epimetrics", {
   v1 <- c(20, 180, 10, 1820)
   v2 <- factor(c(20, 180, 10, 1820))
   m1 <- matrix(v1, byrow = TRUE, ncol = 2)
@@ -40,26 +40,26 @@ testthat::test_that("Compare standalone metrics to diagnostic_metrics", {
   data2 <- data.frame(disease = factor(c(rep(1, 30),rep(0, 2000))),
                       result = factor(c(rep(1, 20),rep(0, 10), rep(0, 1820), rep(1, 180))))
   set.seed(1)
-  t1 <- diagnostic_metrics(v1)
+  t1 <- epimetrics(v1)
   set.seed(1)
-  t2 <- diagnostic_metrics(v2)
+  t2 <- epimetrics(v2)
   set.seed(1)
-  t3 <- diagnostic_metrics(m1)
+  t3 <- epimetrics(m1)
   set.seed(1)
-  t4 <- diagnostic_metrics(df1)
+  t4 <- epimetrics(df1)
   set.seed(1)
-  t5 <- diagnostic_metrics(confusion_matrix(data1$disease, data1$result))
+  t5 <- epimetrics(confusion_matrix(data1$disease, data1$result))
   set.seed(1)
-  t6 <- diagnostic_metrics(confusion_matrix(data2$disease, data2$result))
+  t6 <- epimetrics(confusion_matrix(data2$disease, data2$result))
   set.seed(1)
-  t7 <- diagnostic_metrics(tab1)
+  t7 <- epimetrics(tab1)
   objs <- mget(c("t1", "t2", "t3", "t4", "t5", "t6", "t7"))
   all_equal_pairs <- outer(objs, objs, Vectorize(all.equal))
   all_the_same <- all(all_equal_pairs)
   testthat::expect_true(all_the_same)
 })
 
-testthat::test_that("diagnostic_metrics errors", {
+testthat::test_that("epimetrics errors", {
   set.seed(42)
   x <- matrix(sample(0:10, size = 4 * 20, replace = TRUE), ncol = 4)
   test <- c(44, 20, 11, 23)
@@ -140,21 +140,21 @@ testthat::test_that("diagnostic_metrics errors", {
     )
   )
   set.seed(1)
-  tbl_res1 <- diagnostic_metrics(test, R = 10^4)
-  tbl_res2 <- diagnostic_metrics(test, conf.int = FALSE)
+  tbl_res1 <- epimetrics(test, R = 10^4)
+  tbl_res2 <- epimetrics(test, conf.int = FALSE)
   testthat::expect_equal(tbl_res1, expected_tbl)
   testthat::expect_equal(tbl_res2, expected_tbl[, c("characteristic", 
                                                     "abbreviation", 
                                                     "estimate"),
                                                     drop = FALSE])
   
-  testthat::expect_error(diagnostic_metrics(x))
-  testthat::expect_error(diagnostic_metrics(NULL))
-  testthat::expect_error(diagnostic_metrics(NA))
-  testthat::expect_error(diagnostic_metrics(rep_len(0, 4)))
-  testthat::expect_error(diagnostic_metrics(1:4, R = NULL))
-  testthat::expect_error(diagnostic_metrics(1:4, R = c(1, 2)))
-  testthat::expect_error(diagnostic_metrics(x))
+  testthat::expect_error(epimetrics(x))
+  testthat::expect_error(epimetrics(NULL))
+  testthat::expect_error(epimetrics(NA))
+  testthat::expect_error(epimetrics(rep_len(0, 4)))
+  testthat::expect_error(epimetrics(1:4, R = NULL))
+  testthat::expect_error(epimetrics(1:4, R = c(1, 2)))
+  testthat::expect_error(epimetrics(x))
 })
 testthat::test_that("Compare standalone metrics to each other", {
   set.seed(42)
@@ -243,7 +243,7 @@ testthat::test_that("Compare standalone metrics to each other", {
 testthat::test_that("Expect all outputs to be equal", {
   set.seed(42)
   x <- sample(1:100, size = 4)
-  result1 <- diagnostic_metrics(x)
+  result1 <- epimetrics(x)
   set.seed(42)
   x <- sample(1:100, size = 4)
   sens <- sensitivity(x = x)

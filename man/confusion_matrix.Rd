@@ -42,5 +42,5 @@ rf_predictions <- ifelse(rf_prob_scores >= 0.5, 1, 0)
 outcomes <- pima_test$type
 cm <- confusion_matrix(outcomes, rf_predictions)
 cm
-diagnostic_metrics(cm)
+epimetrics(cm)
 }

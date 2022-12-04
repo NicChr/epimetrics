@@ -47,7 +47,7 @@ rownames(CM) <- c("+Test", "-Test")
 colnames(CM) <- c("+Disease", "-Disease")
 CM
 set.seed(42)
-diagnostic_metrics(CM)
+epimetrics(CM)
 ```
 
 0r from known or theoretical estimates of sensitivity, specificity 
@@ -92,7 +92,7 @@ predictions <- c(rep(1, TP), rep(0, FN), # Disease group predictions
                  rep(1, FP), rep(0, TN)) # Non-disease group predictions
 (cm <- confusion_matrix(outcomes, predictions))
 set.seed(42)
-diagnostic_metrics(cm)
+epimetrics(cm)
 ```
 
 

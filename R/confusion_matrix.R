@@ -33,7 +33,7 @@
 #' outcomes <- pima_test$type
 #' cm <- confusion_matrix(outcomes, rf_predictions)
 #' cm
-#' diagnostic_metrics(cm)
+#' epimetrics(cm)
 #' @export
 confusion_matrix <- function(outcome, prediction){
   cm <- table(outcome, prediction)

@@ -34,10 +34,7 @@
 #' wembc_ci(combs[,2], combs[,1])
 #' @export
 wembc_ci <- function(x, n, alpha = 0.05){
-  max_l <- max(length(x), length(n), length(alpha))
-  x <- numeric(max_l) + x
-  n <- numeric(max_l) + n
-  alpha <- numeric(max_l) + alpha
+  assign2(c("x", "n", "alpha"), recycle_args(x, n, alpha))
   z <- stats::qnorm(1 - (alpha/2))
   p <- x/n
   q <- 1 - p
@@ -51,7 +48,5 @@ wembc_ci <- function(x, n, alpha = 0.05){
   ucl[lb_x] <- 1 - (alpha[lb_x]/2)^(1/n[lb_x])
   lcl[ub_x] <- (alpha[ub_x]/2)^(1/n[ub_x])
   ucl[ub_x] <- 1
-  ci_m <- matrix(c(p, lcl, ucl), ncol = 3, byrow = FALSE)
-  colnames(ci_m) <- c("estimate", "conf.low", "conf.high")
-  ci_m
+  ci_matrix(p, lcl, ucl)
 }

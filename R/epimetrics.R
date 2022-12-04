@@ -41,7 +41,7 @@
 #' @param R Number of simulation replicates. \cr
 #'
 #'
-#' @return The function `diagnostic_metrics()`
+#' @return The function `epimetrics()`
 #' returns a `data.frame` containing the variables:
 #'  \item{characteristic}{The diagnostic test metric.}
 #'  \item{abbreviation}{A 3-letter abbreviation of the characteristic.}
@@ -64,7 +64,7 @@
 #'  If sensitivity, specificity and prevalence are supplied
 #'  then a numeric vector containing only the estimate is returned.
 #'
-#' The following metrics which are all returned by `diagnostic_metrics()`
+#' The following metrics which are all returned by `epimetrics()`
 #' or produced individually using the standalone functions are described:
 #'  \item{TPR}{Sensitivity, or true positive rate.
 #'  This is the proportion of diseased individuals that test positive.
@@ -195,7 +195,7 @@
 #' colnames(confusion) <- c("rt-PCR+", "rt-PCR-")
 #' confusion
 #' # All diagnostic metrics with CIs
-#' diagnostic_metrics(confusion)
+#' epimetrics(confusion)
 #' 
 #' # You can use standalone metrics too
 #' TPR <- sensitivity(x = confusion)
@@ -295,10 +295,10 @@
 #' sensitivity(x = c(TP, FP, FN + FN2, TN + TN2)) # Wilson-score method
 #' c(sim_ppv_lcl, sim_ppv_ucl) # Percentile method
 #' ppv(x = c(TP, FP, FN + FN2, TN + TN2)) # Wilson-score method
-#' @rdname diagnostic_metrics
+#' @rdname epimetrics
 #' @export
-diagnostic_metrics <- function(cm, conf.int = TRUE, 
-                               conf.level = 0.95, R = 10^5){
+epimetrics <- function(cm, conf.int = TRUE, 
+                       conf.level = 0.95, R = 10^5){
   if (length(as.vector(t(cm))) != 4) {
     stop(print(knitr::kable(
       matrix(c("a", "b", "c", "d"),
@@ -308,7 +308,7 @@ diagnostic_metrics <- function(cm, conf.int = TRUE,
                              c("+Outcome", "-Outcome"))))),
       "cm must represent a 2x2 confusion matrix of above form.\n
       Try cm = c(a, b, c, d)")
-    }
+  }
   x <- flatten_confusion(cm)
   TP <- x[,"TP"][[1]]
   FP <- x[,"FP"][[1]]
@@ -317,7 +317,7 @@ diagnostic_metrics <- function(cm, conf.int = TRUE,
   get_characteristics(TP, FP, FN, TN, conf.int = conf.int, 
                       alpha = 1 - conf.level, R = R)
 }
-#' @rdname diagnostic_metrics
+#' @rdname epimetrics
 #' @export
 sensitivity <- function(sensitivity, specificity, prevalence,
                         x, conf.int = TRUE, conf.level = 0.95){
@@ -329,6 +329,7 @@ sensitivity <- function(sensitivity, specificity, prevalence,
     a <- TP
     b <- TP + FN
     if (conf.int){
+      assign2(c("a", "b", "conf.level"), recycle_args(a, b, conf.level))
       est <- wembc_ci(a, b, alpha = 1 - conf.level)
     } else {
       est <- est_matrix(a / b)
@@ -336,14 +337,14 @@ sensitivity <- function(sensitivity, specificity, prevalence,
     rownames(est) <- sprintf("(%.0f/%.0f)", a, b)
     est
   } else {
-   sensitivity
+    sensitivity
   }
 }
-#' @rdname diagnostic_metrics
+#' @rdname epimetrics
 #' @export
 #' @usage NULL
 tpr <- sensitivity
-#' @rdname diagnostic_metrics
+#' @rdname epimetrics
 #' @export
 specificity <- function(sensitivity, specificity, prevalence,
                         x, conf.int = TRUE, conf.level = 0.95){
@@ -355,6 +356,7 @@ specificity <- function(sensitivity, specificity, prevalence,
     a <- TN
     b <- TN + FP
     if (conf.int){
+      assign2(c("a", "b", "conf.level"), recycle_args(a, b, conf.level))
       est <- wembc_ci(a, b, alpha = 1 - conf.level)
     } else {
       est <- est_matrix(a / b)
@@ -365,11 +367,11 @@ specificity <- function(sensitivity, specificity, prevalence,
     specificity
   }
 }
-#' @rdname diagnostic_metrics
+#' @rdname epimetrics
 #' @export
 #' @usage NULL
 tnr <- specificity
-#' @rdname diagnostic_metrics
+#' @rdname epimetrics
 #' @export
 accuracy <- function(sensitivity, specificity, prevalence,
                      x, conf.int = TRUE, conf.level = 0.95){
@@ -382,6 +384,7 @@ accuracy <- function(sensitivity, specificity, prevalence,
     a <- TP + TN
     b <- n
     if (conf.int){
+      assign2(c("a", "b", "conf.level"), recycle_args(a, b, conf.level))
       est <- wembc_ci(a, b, alpha = 1 - conf.level)
     } else {
       est <- est_matrix(a / b)
@@ -392,11 +395,11 @@ accuracy <- function(sensitivity, specificity, prevalence,
     (sensitivity * prevalence) + ( (specificity) * (1 - prevalence) )
   }
 }
-#' @rdname diagnostic_metrics
+#' @rdname epimetrics
 #' @export
 #' @usage NULL
 acc <- accuracy
-#' @rdname diagnostic_metrics
+#' @rdname epimetrics
 #' @export
 balanced_accuracy <- function(sensitivity, specificity, prevalence,
                               x, conf.int = TRUE, conf.level = 0.95){
@@ -408,6 +411,8 @@ balanced_accuracy <- function(sensitivity, specificity, prevalence,
     FN <- x[, "FN", drop = TRUE]
     TN <- x[, "TN", drop = TRUE]
     if (conf.int){
+      assign2(c("TP", "FP", "FN", "TN", "conf.level"), 
+              recycle_args(TP, FP, FN, TN, conf.level))
       est <- (youden_ci(TP, FP, FN, TN, alpha = 1 - conf.level) + 1)/2
     } else {
       TPR <- TP / (TP + FN)
@@ -419,14 +424,14 @@ balanced_accuracy <- function(sensitivity, specificity, prevalence,
     (sensitivity + specificity)/2
   }
 }
-#' @rdname diagnostic_metrics
+#' @rdname epimetrics
 #' @export
 #' @usage NULL
 bac <- balanced_accuracy
-#' @rdname diagnostic_metrics
+#' @rdname epimetrics
 #' @export
 positive_predictive_value <- function(sensitivity, specificity, prevalence,
-                x, conf.int = TRUE, conf.level = 0.95){
+                                      x, conf.int = TRUE, conf.level = 0.95){
   x_exists <- contains_empirical(sensitivity, specificity, prevalence, x)
   if (x_exists){
     x <- flatten_confusion(x)
@@ -435,6 +440,7 @@ positive_predictive_value <- function(sensitivity, specificity, prevalence,
     a <- TP
     b <- TP + FP
     if (conf.int){
+      assign2(c("a", "b", "conf.level"), recycle_args(a, b, conf.level))
       est <- wembc_ci(a, b, alpha = 1 - conf.level)
     } else {
       est <- est_matrix(a / b)
@@ -447,11 +453,11 @@ positive_predictive_value <- function(sensitivity, specificity, prevalence,
          (1 - specificity) * (1 - prevalence) )
   }
 }
-#' @rdname diagnostic_metrics
+#' @rdname epimetrics
 #' @export
 #' @usage NULL
 ppv <- positive_predictive_value
-#' @rdname diagnostic_metrics
+#' @rdname epimetrics
 #' @export
 negative_predictive_value <- function(sensitivity, specificity, prevalence,
                                       x, conf.int = TRUE, conf.level = 0.95){
@@ -463,6 +469,7 @@ negative_predictive_value <- function(sensitivity, specificity, prevalence,
     a <- TN
     b <- TN + FN
     if (conf.int){
+      assign2(c("a", "b", "conf.level"), recycle_args(a, b, conf.level))
       est <- wembc_ci(a, b, alpha = 1 - conf.level)
     } else {
       est <- est_matrix(a / b)
@@ -475,14 +482,14 @@ negative_predictive_value <- function(sensitivity, specificity, prevalence,
          ( (1 - sensitivity) * prevalence ) )
   }
 }
-#' @rdname diagnostic_metrics
+#' @rdname epimetrics
 #' @export
 #' @usage NULL
 npv <- negative_predictive_value
-#' @rdname diagnostic_metrics
+#' @rdname epimetrics
 #' @export
 positive_likelihood_ratio <- function(sensitivity, specificity, prevalence,
-                x, conf.int = TRUE, conf.level = 0.95){
+                                      x, conf.int = TRUE, conf.level = 0.95){
   x_exists <- contains_empirical(sensitivity, specificity, prevalence, x)
   if (x_exists){
     x <- flatten_confusion(x)
@@ -491,6 +498,8 @@ positive_likelihood_ratio <- function(sensitivity, specificity, prevalence,
     FN <- x[, "FN", drop = TRUE]
     TN <- x[, "TN", drop = TRUE]
     if (conf.int){
+      assign2(c("TP", "FP", "FN", "TN", "conf.level"), 
+              recycle_args(TP, FP, FN, TN, conf.level))
       est <- plr_ci(TP, FP, FN, TN, alpha = 1 - conf.level)
     } else {
       est <- est_matrix((TP / (TP + FN) ) / (FP / (TN + FP)))
@@ -505,14 +514,14 @@ positive_likelihood_ratio <- function(sensitivity, specificity, prevalence,
     sensitivity / (1 - specificity)
   }
 }
-#' @rdname diagnostic_metrics
+#' @rdname epimetrics
 #' @export
 #' @usage NULL
 plr <- positive_likelihood_ratio
-#' @rdname diagnostic_metrics
+#' @rdname epimetrics
 #' @export
 negative_likelihood_ratio <- function(sensitivity, specificity, prevalence,
-                x, conf.int = TRUE, conf.level = 0.95){
+                                      x, conf.int = TRUE, conf.level = 0.95){
   x_exists <- contains_empirical(sensitivity, specificity, prevalence, x)
   if (x_exists){
     x <- flatten_confusion(x)
@@ -521,6 +530,8 @@ negative_likelihood_ratio <- function(sensitivity, specificity, prevalence,
     FN <- x[, "FN", drop = TRUE]
     TN <- x[, "TN", drop = TRUE]
     if (conf.int){
+      assign2(c("TP", "FP", "FN", "TN", "conf.level"), 
+              recycle_args(TP, FP, FN, TN, conf.level))
       est <- nlr_ci(TP, FP, FN, TN, alpha = 1 - conf.level)
     } else {
       est <- est_matrix((FN / (TP + FN) ) / (TN / (TN + FP)))
@@ -535,14 +546,14 @@ negative_likelihood_ratio <- function(sensitivity, specificity, prevalence,
     (1 - sensitivity) / specificity
   }
 }
-#' @rdname diagnostic_metrics
+#' @rdname epimetrics
 #' @export
 #' @usage NULL
 nlr <- negative_likelihood_ratio
-#' @rdname diagnostic_metrics
+#' @rdname epimetrics
 #' @export
 diagnostic_odds_ratio <- function(sensitivity, specificity, prevalence,
-                x, conf.int = TRUE, conf.level = 0.95){
+                                  x, conf.int = TRUE, conf.level = 0.95){
   x_exists <- contains_empirical(sensitivity, specificity, prevalence, x)
   if (x_exists){
     x <- flatten_confusion(x)
@@ -551,6 +562,8 @@ diagnostic_odds_ratio <- function(sensitivity, specificity, prevalence,
     FN <- x[, "FN", drop = TRUE]
     TN <- x[, "TN", drop = TRUE]
     if (conf.int){
+      assign2(c("TP", "FP", "FN", "TN", "conf.level"), 
+              recycle_args(TP, FP, FN, TN, conf.level))
       est <- dor_ci(TP, FP, FN, TN, alpha = 1 - conf.level)
     } else {
       PLR <- (TP / (TP + FN) ) / (FP / (TN + FP))
@@ -563,11 +576,11 @@ diagnostic_odds_ratio <- function(sensitivity, specificity, prevalence,
     (sensitivity * specificity) / ((1 - sensitivity) * (1 - specificity))
   }
 }
-#' @rdname diagnostic_metrics
+#' @rdname epimetrics
 #' @export
 #' @usage NULL
 dor <- diagnostic_odds_ratio
-#' @rdname diagnostic_metrics
+#' @rdname epimetrics
 #' @export
 true_prevalence <- function(sensitivity, specificity, prevalence,
                             x, conf.int = TRUE, conf.level = 0.95){
@@ -580,6 +593,7 @@ true_prevalence <- function(sensitivity, specificity, prevalence,
     a <- TP + FN
     b <- n
     if (conf.int){
+      assign2(c("a", "b", "conf.level"), recycle_args(a, b, conf.level))
       est <- wembc_ci(a, b, alpha = 1 - conf.level)
     } else {
       est <- est_matrix(a / b)
@@ -590,11 +604,11 @@ true_prevalence <- function(sensitivity, specificity, prevalence,
     prevalence
   }
 }
-#' @rdname diagnostic_metrics
+#' @rdname epimetrics
 #' @export
 #' @usage NULL
 tpv <- true_prevalence
-#' @rdname diagnostic_metrics
+#' @rdname epimetrics
 #' @export
 apparent_prevalence <- function(sensitivity, specificity, prevalence,
                                 x, conf.int = TRUE, conf.level = 0.95){
@@ -609,6 +623,7 @@ apparent_prevalence <- function(sensitivity, specificity, prevalence,
     a <- TP + FP
     b <- n
     if (conf.int){
+      assign2(c("a", "b", "conf.level"), recycle_args(a, b, conf.level))
       est <- wembc_ci(a, b, alpha = 1 - conf.level)
     } else {
       est <- est_matrix(a / b)
@@ -619,11 +634,11 @@ apparent_prevalence <- function(sensitivity, specificity, prevalence,
     (sensitivity * prevalence) + ( (1 - specificity) * (1 - prevalence) )
   }
 }
-#' @rdname diagnostic_metrics
+#' @rdname epimetrics
 #' @export
 #' @usage NULL
 apv <- apparent_prevalence
-#' @rdname diagnostic_metrics
+#' @rdname epimetrics
 #' @export
 prevalence_threshold <- function(sensitivity, specificity, prevalence,
                                  x, conf.int = TRUE, 
@@ -636,6 +651,8 @@ prevalence_threshold <- function(sensitivity, specificity, prevalence,
     FN <- x[, "FN", drop = TRUE]
     TN <- x[, "TN", drop = TRUE]
     if (conf.int){
+      assign2(c("TP", "FP", "FN", "TN", "conf.level"), 
+              recycle_args(TP, FP, FN, TN, conf.level))
       est <- prevalence_threshold_ci(TP, FP, FN, TN, 
                                      alpha = 1 - conf.level, R = R)
     } else {
@@ -659,11 +676,11 @@ prevalence_threshold <- function(sensitivity, specificity, prevalence,
     prev_thresh
   }
 }
-#' @rdname diagnostic_metrics
+#' @rdname epimetrics
 #' @export
 #' @usage NULL
 prt <- prevalence_threshold
-#' @rdname diagnostic_metrics
+#' @rdname epimetrics
 #' @export
 youden_index <- function(sensitivity, specificity, prevalence,
                          x, conf.int = TRUE, conf.level = 0.95){
@@ -675,6 +692,8 @@ youden_index <- function(sensitivity, specificity, prevalence,
     FN <- x[, "FN", drop = TRUE]
     TN <- x[, "TN", drop = TRUE]
     if (conf.int){
+      assign2(c("TP", "FP", "FN", "TN", "conf.level"), 
+              recycle_args(TP, FP, FN, TN, conf.level))
       est <- youden_ci(TP, FP, FN, TN, alpha = 1 - conf.level)
     } else {
       TPR <- TP / (TP + FN)
@@ -686,11 +705,11 @@ youden_index <- function(sensitivity, specificity, prevalence,
     sensitivity + specificity - 1
   }
 }
-#' @rdname diagnostic_metrics
+#' @rdname epimetrics
 #' @export
 #' @usage NULL
 yix <- youden_index
-#' @rdname diagnostic_metrics
+#' @rdname epimetrics
 #' @export
 number_needed_to_diagnose <- function(sensitivity, specificity, prevalence,
                                       x, conf.int = TRUE, 
@@ -703,6 +722,8 @@ number_needed_to_diagnose <- function(sensitivity, specificity, prevalence,
     FN <- x[, "FN", drop = TRUE]
     TN <- x[, "TN", drop = TRUE]
     if (conf.int){
+      assign2(c("TP", "FP", "FN", "TN", "conf.level"), 
+              recycle_args(TP, FP, FN, TN, conf.level))
       est <- nnd_ci(TP, FP, FN, TN, alpha = 1 - conf.level, R = R)
     } else {
       TPR <- TP / (TP + FN)
@@ -714,18 +735,16 @@ number_needed_to_diagnose <- function(sensitivity, specificity, prevalence,
     1/(sensitivity + specificity - 1)
   }
 }
-#' @rdname diagnostic_metrics
+#' @rdname epimetrics
 #' @export
 #' @usage NULL
 nnd <- number_needed_to_diagnose
 
 contains_empirical <- function(sensitivity, specificity, prevalence, x){
   x_exists <- !missing(x)
-  rates_exist <- !missing(
-    sensitivity) || 
+  rates_exist <- !missing(sensitivity) || 
     !missing(specificity) || 
-    !missing(prevalence
-    )
+    !missing(prevalence)
   if (x_exists && rates_exist){
     stop("Please supply either sensitivity, specificity 
          and prevalence OR a 2x2 confusion matrix x")
@@ -735,6 +754,13 @@ contains_empirical <- function(sensitivity, specificity, prevalence, x){
 est_matrix <- function(x){
   M <- matrix(x, ncol = 1, byrow = FALSE)
   colnames(M) <- "estimate"
+  M
+}
+ci_matrix <- function(x, lcl, ucl){
+  M <- matrix(c(x, lcl, ucl), 
+              ncol = 3, 
+              byrow = FALSE)
+  colnames(M) <- c("estimate", "conf.low", "conf.high")
   M
 }
 get_characteristics <- function(TP, FP, FN, TN, 
@@ -833,7 +859,7 @@ get_characteristics <- function(TP, FP, FN, TN,
                                       PPV_ci, NPV_ci, PLR_ci, NLR_ci, 
                                       DOR_ci, TPV_ci, APV_ci, 
                                       PRT_ci, YIX_ci, NND_ci),
-                                         function(x) x[[1]], 
+                                 function(x) x[[1]], 
                                  FUN.VALUE = numeric(1))
     characteristic_ucl <- vapply(list(TPR_ci, TNR_ci, ACC_ci, BAC_ci, 
                                       PPV_ci, NPV_ci, PLR_ci, NLR_ci, 
@@ -848,12 +874,14 @@ get_characteristics <- function(TP, FP, FN, TN,
 }
 # Youden index confidence interval using wilson-score interval
 youden_ci <- function(TP, FP, FN, TN, alpha = 0.05){
+  assign2(c("TP", "FP", "FN", "TN", "alpha"), 
+          recycle_args(TP, FP, FN, TN, alpha))
   # As described in Guogen Shan (2015) using wilson-score interval
   n <- TP + FN
   m <- TN + FP
   p1 <- FP/m
   p2 <- TP/n
-
+  
   # J <- p2 - p1 # Jouden index
   J <- (TP / (TP + FN)) + (TN / (TN + FP)) - 1
   z <- stats::qnorm(1-(alpha/2))
@@ -869,17 +897,11 @@ youden_ci <- function(TP, FP, FN, TN, alpha = 0.05){
   epsilon <- z * sqrt( ((l1 * (1-l1))/m) + ((u2 * (1-u2))/n))
   J_lcl <- J - delta
   J_ucl <- J + epsilon
-  J_m <- matrix(c(J, J_lcl, J_ucl), ncol = 3, byrow = FALSE)
-  colnames(J_m) <- c("estimate", "conf.low", "conf.high")
-  J_m
+  ci_matrix(J, J_lcl, J_ucl)
 }
 nnd_ci <- function(TP, FP, FN, TN, alpha = 0.05, R = 10^5){
-  max_l <- max(length(TP), length(FP), length(FN), length(TN), length(alpha))
-  TP <- numeric(max_l) + TP
-  FP <- numeric(max_l) + FP
-  FN <- numeric(max_l) + FN
-  TN <- numeric(max_l) + TN
-  alpha <- numeric(max_l) + alpha
+  assign2(c("TP", "FP", "FN", "TN", "alpha"), 
+          recycle_args(TP, FP, FN, TN, alpha))
   n <- TP + FN
   m <- TN + FP
   p1 <- FP/m
@@ -906,36 +928,23 @@ nnd_ci <- function(TP, FP, FN, TN, alpha = 0.05, R = 10^5){
   nnd_m_span0 <- nnd_m[which_span0,, drop = FALSE]
   if (length(which_span0 > 0)){
     stopifnot(length(R) == 1)
-    message("NND CI spans 0. The largest bounds produced by the 
-            collective wilson-score, 
-            substitution, 
-            and simulated percentile methods will be used.")
+    message("NND CI spans 0. Simulated percentile method will be used.")
     confusion_m <- matrix(c(TP[which_span0], FP[which_span0], 
                             FN[which_span0], TN[which_span0],
                             alpha[which_span0]),
                           byrow = FALSE, ncol = 5)
-    w_nnd_lcl <- nnd_m_span0[,3, drop = TRUE]
-    w_nnd_ucl <- nnd_m_span0[,2, drop = TRUE]
-    # Substitution method
-    nnd_se <- sqrt( ((p2*(1 - p2))/n) + ((p1 * (1 - p1))/m))
-    exact_nnd_lcl <- 1/( (p2 - p1) - z * nnd_se )
-    exact_nnd_ucl <- 1/( (p2 - p1) + z * nnd_se )
-    exact_nnd_lcl <- exact_nnd_lcl[which_span0]
-    exact_nnd_ucl <- exact_nnd_ucl[which_span0]
     # Percentile Method
     if ((nrow(confusion_m) * R) >= 1e07) {
-      warning("N simulations >= 1e07, consider reducing R")
-      }
+      warning("N simulations >= 1e07, consider reducing R", immediate. = TRUE)
+    }
     sim_nnd_ci <- t(apply(confusion_m, 1, function(x){
       sim_nnd <- 1/sim_youden_index(x[1], x[2], x[3], x[4], R = R)
       stats::quantile(sim_nnd, c(x[5]/2, 1 - (x[5]/2)), na.rm = TRUE)
     }))
     sim_nnd_lcl <- sim_nnd_ci[,1, drop = TRUE]
     sim_nnd_ucl <- sim_nnd_ci[,2, drop = TRUE]
-    nnd_lcl_span0 <- pmin(w_nnd_lcl, exact_nnd_lcl, sim_nnd_lcl, na.rm = TRUE)
-    nnd_ucl_span0 <- pmax(w_nnd_ucl, exact_nnd_ucl, sim_nnd_ucl, na.rm = TRUE)
-    nnd_m[which_span0, 2] <- nnd_lcl_span0
-    nnd_m[which_span0, 3] <- nnd_ucl_span0
+    nnd_m[which_span0, 2] <- sim_nnd_lcl
+    nnd_m[which_span0, 3] <- sim_nnd_ucl
   }
   colnames(nnd_m) <- c("estimate", "conf.low", "conf.high")
   nnd_m
@@ -959,30 +968,30 @@ sim_youden_index <- function(TP, FP, FN, TN, R = 10^5){
   TPRs + TNRs - 1
 }
 plr_ci <- function(TP, FP, FN, TN, alpha = 0.05){
+  assign2(c("TP", "FP", "FN", "TN", "alpha"), 
+          recycle_args(TP, FP, FN, TN, alpha))
   z <- stats::qnorm(1 - (alpha / 2))
   PLR <- (TP / (TP + FN) ) / (FP / (TN + FP))
   PLR_se <- sqrt((1 / TP) - (1 / (TP + FN)) +
                    (1 / FP) - (1 / (FP + TN)))
   PLR_lcl <- exp(log(PLR) - z * PLR_se)
   PLR_ucl <- exp(log(PLR) + z * PLR_se)
-  PLR_m <- matrix(c(PLR, PLR_lcl, PLR_ucl),
-                  byrow = FALSE, ncol = 3)
-  colnames(PLR_m) <- c("estimate", "conf.low", "conf.high")
-  PLR_m
+  ci_matrix(PLR, PLR_lcl, PLR_ucl)
 }
 nlr_ci <- function(TP, FP, FN, TN, alpha = 0.05){
+  assign2(c("TP", "FP", "FN", "TN", "alpha"), 
+          recycle_args(TP, FP, FN, TN, alpha))
   z <- stats::qnorm(1 - (alpha/2))
   NLR <- (FN / (TP + FN) ) / (TN / (TN + FP))
   NLR_se <- sqrt((1/FN) - (1/(TP + FN)) +
                    (1/TN) - (1/(FP + TN)))
   NLR_lcl <- exp(log(NLR) - z * NLR_se)
   NLR_ucl <- exp(log(NLR) + z * NLR_se)
-  NLR_m <- matrix(c(NLR, NLR_lcl, NLR_ucl),
-                  byrow = FALSE, ncol = 3)
-  colnames(NLR_m) <- c("estimate", "conf.low", "conf.high")
-  NLR_m
+  ci_matrix(NLR, NLR_lcl, NLR_ucl)
 }
 dor_ci <- function(TP, FP, FN, TN, alpha = 0.05){
+  assign2(c("TP", "FP", "FN", "TN", "alpha"), 
+          recycle_args(TP, FP, FN, TN, alpha))
   z <- stats::qnorm(1 - (alpha/2))
   PLR <- (TP / (TP + FN) ) / (FP / (TN + FP))
   NLR <- (FN / (TP + FN) ) / (TN / (TN + FP))
@@ -990,10 +999,7 @@ dor_ci <- function(TP, FP, FN, TN, alpha = 0.05){
   DOR_se <- sqrt((1/TP) + (1/TN) + (1/FP) + (1/FN))
   DOR_lcl <- exp(log(DOR) - z * DOR_se)
   DOR_ucl <- exp(log(DOR) + z * DOR_se)
-  DOR_m <- matrix(c(DOR, DOR_lcl, DOR_ucl),
-                  byrow = FALSE, ncol = 3)
-  colnames(DOR_m) <- c("estimate", "conf.low", "conf.high")
-  DOR_m
+  ci_matrix(DOR, DOR_lcl, DOR_ucl)
 }
 sim_prevalence_threshold <- function(TP, FP, FN, TN, R = 10^5){
   stopifnot(length(TP) == 1)
@@ -1034,7 +1040,7 @@ prevalence_threshold_ci <- function(TP, FP, FN, TN, alpha = 0.05, R = 10^5){
   confusion_m <- matrix(c(TP, FP, FN, TN, alpha),
                         ncol = 5, byrow = FALSE)
   if ((nrow(confusion_m) * R) >= 1e07) {
-    warning("N simulations >= 1e07, consider reducing R")
+    warning("N simulations >= 1e07, consider reducing R", immediate. = TRUE)
   }
   sim_prev_thresh_ci <- t(apply(confusion_m, 1, function(x){
     sim_prev_thresh <- sim_prevalence_threshold(x[1], x[2], x[3], x[4], R = R)
@@ -1042,11 +1048,7 @@ prevalence_threshold_ci <- function(TP, FP, FN, TN, alpha = 0.05, R = 10^5){
   }))
   sim_prev_thresh_lcl <- sim_prev_thresh_ci[,1, drop = TRUE]
   sim_prev_thresh_ucl <- sim_prev_thresh_ci[,2, drop = TRUE]
-  prev_thresh_m <- matrix(c(prev_thresh,
-                            sim_prev_thresh_lcl,
-                            sim_prev_thresh_ucl),
-                          byrow = FALSE, ncol = 3)
-  colnames(prev_thresh_m) <- c("estimate", "conf.low", "conf.high")
-  prev_thresh_m
+  ci_matrix(prev_thresh,
+            sim_prev_thresh_lcl,
+            sim_prev_thresh_ucl)
 }
-
